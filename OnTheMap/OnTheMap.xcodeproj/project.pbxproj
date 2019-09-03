@@ -28,6 +28,7 @@
 		3DDC64F5231D312400447D41 /* StudentLocation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3DDC64F4231D312400447D41 /* StudentLocation.swift */; };
 		3DDC64F7231D409900447D41 /* PostStudentLocationResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3DDC64F6231D409900447D41 /* PostStudentLocationResponse.swift */; };
 		3DDC64F9231D48A200447D41 /* UpdateStudentLocationResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3DDC64F8231D48A200447D41 /* UpdateStudentLocationResponse.swift */; };
+		3DDC64FB231E986200447D41 /* OntheMapError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3DDC64FA231E986200447D41 /* OntheMapError.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -54,6 +55,7 @@
 		3DDC64F4231D312400447D41 /* StudentLocation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StudentLocation.swift; sourceTree = "<group>"; };
 		3DDC64F6231D409900447D41 /* PostStudentLocationResponse.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PostStudentLocationResponse.swift; sourceTree = "<group>"; };
 		3DDC64F8231D48A200447D41 /* UpdateStudentLocationResponse.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UpdateStudentLocationResponse.swift; sourceTree = "<group>"; };
+		3DDC64FA231E986200447D41 /* OntheMapError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OntheMapError.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -126,6 +128,7 @@
 				3DA35952231A0E6A00E20697 /* APIClient.swift */,
 				3DA35954231A0ECC00E20697 /* ParseAPIClient.swift */,
 				3DA35956231A0EEE00E20697 /* UdacityAPIClient.swift */,
+				3DDC64FA231E986200447D41 /* OntheMapError.swift */,
 			);
 			path = Model;
 			sourceTree = "<group>";
@@ -224,6 +227,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				3DDC64F5231D312400447D41 /* StudentLocation.swift in Sources */,
+				3DDC64FB231E986200447D41 /* OntheMapError.swift in Sources */,
 				3DDC64ED231BFDA600447D41 /* UIViewController+Extension.swift in Sources */,
 				3DA35955231A0ECC00E20697 /* ParseAPIClient.swift in Sources */,
 				3DDC64F7231D409900447D41 /* PostStudentLocationResponse.swift in Sources */,

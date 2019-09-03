@@ -14,17 +14,24 @@ class MapViewController: UIViewController, MKMapViewDelegate {
     @IBOutlet weak var mapView: MKMapView!
     
     @IBAction func refreshTapped(_ sender: UIBarButtonItem) {
-        fetchStudentLocations() {
-            print("Successfully refreshed locations.")
-            self.showLocations()
+        fetchStudentLocations { (success, error) in
+            if success == true {
+                self.showLocations()
+            } else {
+                self.showError(title: "Can't refresh data", message: error?.localizedDescription ?? "") {}
+            }
         }
     }
     
     override func viewDidLoad() {
         super.viewDidLoad()
         // Let's fetch student locations.
-        fetchStudentLocations() {
-            self.showLocations()
+        fetchStudentLocations { (success, error) in
+            if success == true {
+                self.showLocations()
+            } else {
+                self.showError(title: "Can't fetch data", message: error?.localizedDescription ?? "") {}
+            }
         }
     }
     

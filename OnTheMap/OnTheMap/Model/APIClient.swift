@@ -12,83 +12,59 @@ class APIClient {
     
     static let base = "https://onthemap-api.udacity.com/v1"
 
-    class func taskForGETRequest<ResponseType: Decodable>(url: URL, responseType: ResponseType.Type, completion: @escaping (ResponseType?, Error?) -> Void) {
+    class func taskForGETRequest<ResponseType: Decodable>(url: URL, responseType: ResponseType.Type, completion: @escaping (ResponseType?, OnTheMapError?) -> Void) {
         let task = URLSession.shared.dataTask(with: url) { data, response, error in
-            guard let data = data else {
-                DispatchQueue.main.async {
-                    completion(nil, error)
-                }
-                return
-            }
-            let decoder = JSONDecoder()
-            do {
-                let responseObject = try decoder.decode(ResponseType.self, from: data)
-                DispatchQueue.main.async {
-                    completion(responseObject, nil)
-                }
-            } catch {
-                do {
-                    let errorResponse = try decoder.decode(ResponseType.self, from: data)
-                    DispatchQueue.main.async {
-                        completion(nil, errorResponse as? Error)
-                    }
-                } catch {
-                    DispatchQueue.main.async {
-                        completion(nil, error)
-                    }
-                }
-            }
+            self.handleResponse(data, response, error, responseType, completion)
         }
         task.resume()
     }
     
-    class func taskForPOSTRequest<RequestType: Encodable, ResponseType: Decodable>(url: URL, responseType: ResponseType.Type, body: RequestType, completion: @escaping (ResponseType?, Error?) -> Void) {
+    class func taskForPOSTRequest<RequestType: Encodable, ResponseType: Decodable>(url: URL, responseType: ResponseType.Type, body: RequestType, completion: @escaping (ResponseType?, OnTheMapError?) -> Void) {
         var urlRequest = URLRequest(url: url)
         urlRequest.httpMethod = "POST"
         urlRequest.addValue("application/json", forHTTPHeaderField: "Accept")
         urlRequest.addValue("application/json", forHTTPHeaderField: "Content-Type")
         urlRequest.httpBody = try! JSONEncoder().encode(body)
         let task = URLSession.shared.dataTask(with: urlRequest) { data, response, error in
-            guard let data = data else {
-                DispatchQueue.main.async {
-                    completion(nil, error)
-                }
-                return
-            }
-            let decoder = JSONDecoder()
-            do {
-                let responseObject = try decoder.decode(ResponseType.self, from: data)
-                DispatchQueue.main.async {
-                    completion(responseObject, nil)
-                }
-            } catch {
-                do {
-                    let errorResponse = try decoder.decode(ResponseType.self, from: data)
-                    DispatchQueue.main.async {
-                        completion(nil, errorResponse as? Error)
-                    }
-                } catch {
-                    DispatchQueue.main.async {
-                        completion(nil, error)
-                    }
-                }
-            }
+            self.handleResponse(data, response, error, responseType, completion)
         }
         task.resume()
     }
     
-    class func taskForPUTRequest<RequestType: Encodable, ResponseType: Decodable>(url: URL, responseType: ResponseType.Type, body: RequestType, completion: @escaping (ResponseType?, Error?) -> Void) {
+    class func taskForPUTRequest<RequestType: Encodable, ResponseType: Decodable>(url: URL, responseType: ResponseType.Type, body: RequestType, completion: @escaping (ResponseType?, OnTheMapError?) -> Void) {
         var urlRequest = URLRequest(url: url)
         urlRequest.httpMethod = "PUT"
         urlRequest.addValue("application/json", forHTTPHeaderField: "Content-Type")
         urlRequest.httpBody = try! JSONEncoder().encode(body)
         let task = URLSession.shared.dataTask(with: urlRequest) { data, response, error in
+            self.handleResponse(data, response, error, responseType, completion)
+        }
+        task.resume()
+    }
+    
+    private class func handleResponse<ResponseType: Decodable>(_ data: Data?, _ response: URLResponse?, _ error: Error?, _ responseType: ResponseType.Type, _ completion: @escaping (ResponseType?, OnTheMapError?) -> Void) {
+        if error != nil {
+            DispatchQueue.main.async {
+                completion(nil, OnTheMapError(errorCode: nil))
+            }
+            return
+        }
+        
+        // Let's check the response to see if its a success or not.
+        guard let httpStatusCode = (response as? HTTPURLResponse)?.statusCode else {
+            // Ideally this should never happen.
+            completion(nil, OnTheMapError(errorCode: nil))
+            return
+        }
+        
+        if httpStatusCode >= 200 && httpStatusCode < 300 {
             guard let data = data else {
                 DispatchQueue.main.async {
-                    completion(nil, error)
+                    completion(nil, OnTheMapError(errorCode: .NoResponse))
                 }
                 return
             }
+            // Success case
             let decoder = JSONDecoder()
             do {
                 let responseObject = try decoder.decode(ResponseType.self, from: data)
@@ -96,19 +72,15 @@ class APIClient {
                     completion(responseObject, nil)
                 }
             } catch {
-                do {
-                    let errorResponse = try decoder.decode(ResponseType.self, from: data)
-                    DispatchQueue.main.async {
-                        completion(nil, errorResponse as? Error)
-                    }
-                } catch {
-                    DispatchQueue.main.async {
-                        completion(nil, error)
-                    }
+                DispatchQueue.main.async {
+                    completion(nil, OnTheMapError(errorCode: .DecodingFailed))
                 }
             }
+        } else {
+            DispatchQueue.main.async {
+                completion(nil, OnTheMapError(errorCode: .ServerError))
+            }
         }
-        task.resume()
     }
     
     class func taskForDELETERequest<RequestType: Encodable>(url: URL, body: RequestType, completion: @escaping () -> Void) {

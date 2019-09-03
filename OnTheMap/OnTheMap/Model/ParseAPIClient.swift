@@ -37,18 +37,18 @@ class ParseAPIClient: APIClient {
         }
     }
     
-    class func getStudentLocations(completion: @escaping () -> Void) {
+    class func getStudentLocations(completion: @escaping (Bool, OnTheMapError?) -> Void) {
         taskForGETRequest(url: Endpoints.getStudentLocations(100).url, responseType: StudentLocationsResponse.self) { (response, error) in
             if let response = response {
                 CachedLocations.studentLocations = response.results
-                completion()
+                completion(true, nil)
             } else {
-                completion()
+                completion(false, error)
             }
         }
     }
     
-    class func postStudentLocation(studentLocation: StudentLocation, completion: @escaping (Bool, Error?) -> Void) {
+    class func postStudentLocation(studentLocation: StudentLocation, completion: @escaping (Bool, OnTheMapError?) -> Void) {
         taskForPOSTRequest(url: Endpoints.postStudentLocation.url, responseType: PostStudentLocationResponse.self, body: studentLocation) { (response, error) in
             if let response = response {
                 PostedLocation.postedLocationObjectId = response.objectId
@@ -60,7 +60,7 @@ class ParseAPIClient: APIClient {
         }
     }
     
-    class func updateStudentLocation(objectId: String, studentLocation: StudentLocation, completion: @escaping (Bool, Error?) -> Void) {
+    class func updateStudentLocation(objectId: String, studentLocation: StudentLocation, completion: @escaping (Bool, OnTheMapError?) -> Void) {
         taskForPUTRequest(url: Endpoints.updateStudentLocation(objectId).url, responseType: UpdateStudentLocationResponse.self, body: studentLocation) { (response, error) in
             if let response = response {
                 PostedLocation.createdOrUpdatedAt = response.updatedAt

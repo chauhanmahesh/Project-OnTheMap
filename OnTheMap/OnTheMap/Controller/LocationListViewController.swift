@@ -13,9 +13,12 @@ class LocationListViewController: UIViewController, UITableViewDelegate, UITable
     @IBOutlet weak var tableView: UITableView!
     
     @IBAction func refreshTapped(_ sender: UIBarButtonItem) {
-        fetchStudentLocations() {
-            print("Successfully refreshed locations.")
-            self.tableView.reloadData()
+        fetchStudentLocations { (success, error) in
+            if success == true {
+                self.tableView.reloadData()
+            } else {
+                self.showError(title: "Can't refresh data", message: error?.localizedDescription ?? "") {}
+            }
         }
     }
     

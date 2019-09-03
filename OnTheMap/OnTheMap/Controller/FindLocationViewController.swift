@@ -13,6 +13,8 @@ class FindLocationViewController: UIViewController {
     
     @IBOutlet weak var locationField: UITextField!
     @IBOutlet weak var linkField: UITextField!
+    @IBOutlet weak var activityIndicator: UIActivityIndicatorView!
+    @IBOutlet weak var findingLocation: UIButton!
     
     var placeMarkFound: CLPlacemark!
     
@@ -22,32 +24,31 @@ class FindLocationViewController: UIViewController {
     
     @IBAction func findLocationTapped(_ sender: Any) {
         // Let's guard for the information entered.
-        
-        guard let location = locationField.text else {
-            showErrorMessage(message: "Type location before searching.")
-            return
+        if locationField.text?.isEmpty == true || linkField.text?.isEmpty == true {
+            showError(title: "Can't find Location", message: "Please enter both location and link before searching.") {}
+            return;
         }
-
-        guard let link = linkField.text else {
-            showErrorMessage(message: "Type link before searching.")
-            return
-        }
-
-        searchLocation(address: location, linkToPost: link)
+        setFindingLocation(true)
+        searchLocation(address: locationField.text ?? "", linkToPost: linkField.text ?? "")
     }
     
     func searchLocation(address: String, linkToPost: String) {
         CLGeocoder().geocodeAddressString(address, completionHandler: { placemarks, error in
             if (error != nil) {
-                self.showErrorMessage(message: "Not able to find this location. Please try again.")
+                self.showError(title: "Can't find Location", message: "Not able to find this location. Please try again.") {
+                    self.setFindingLocation(false)
+                }
                 return
             }
             
             if let placemark = placemarks?[0]  {
+                self.setFindingLocation(false)
                 self.placeMarkFound = placemark
                 self.performSegue(withIdentifier: "postLocation", sender: nil)
             } else {
-                self.showErrorMessage(message: "Not able to find this location. Please try again.")
+                self.showError(title: "Can't find Location", message: "Not able to find this location. Please try again.") {
+                    self.setFindingLocation(false)
+                }
             }
         })
     }
@@ -63,10 +64,13 @@ class FindLocationViewController: UIViewController {
         }
     }
     
-    func showErrorMessage(message: String) {
-        let alertVC = UIAlertController(title: "Can't find Location", message: message, preferredStyle: .alert)
-        alertVC.addAction(UIAlertAction(title: "OK", style: .default))
-        self.present(alertVC, animated: true, completion: nil)
+    func setFindingLocation(_ finding: Bool) {
+        if finding {
+            activityIndicator.startAnimating()
+        } else {
+            activityIndicator.stopAnimating()
+        }
+        findingLocation.isEnabled = !finding
     }
     
 }

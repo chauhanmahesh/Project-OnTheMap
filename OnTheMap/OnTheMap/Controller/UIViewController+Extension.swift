@@ -16,10 +16,16 @@ extension UIViewController {
         }
     }
     
-    func fetchStudentLocations(completion: @escaping () -> Void) {
-        ParseAPIClient.getStudentLocations() {
-            completion()
-        }
+    func showError(title: String, message: String, actionHandler: @escaping () -> Void) {
+        let alertVC = UIAlertController(title: title, message: message, preferredStyle: .alert)
+        alertVC.addAction(UIAlertAction(title: "OK", style: .default, handler: { action in
+            actionHandler()
+        }))
+        self.present(alertVC, animated: true, completion: nil)
+    }
+    
+    func fetchStudentLocations(completion: @escaping (Bool, OnTheMapError?) -> Void) {
+        ParseAPIClient.getStudentLocations(completion: completion)
     }
     
 }

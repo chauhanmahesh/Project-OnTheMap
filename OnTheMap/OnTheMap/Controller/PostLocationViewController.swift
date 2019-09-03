@@ -30,12 +30,14 @@ class PostLocationViewController: UIViewController, MKMapViewDelegate {
         }
     }
     
-    func handlePostLocationResponse(success: Bool, error: Error?) {
+    func handlePostLocationResponse(success: Bool, error: OnTheMapError?) {
         if success {
             // Successfully posted the location. let's close the view.
             self.dismiss(animated: true, completion: nil)
         } else {
-            showErrorMessage(message: error?.localizedDescription ?? "")
+            showError(title: "Can't post Location", message: error?.localizedDescription ?? "") {
+                self.setPostingLocation(false)
+            }
         }
     }
     
@@ -59,6 +61,11 @@ class PostLocationViewController: UIViewController, MKMapViewDelegate {
 
         // When the array is complete, we add the annotations to the map.
         self.mapView.addAnnotations(annotations)
+        
+        // Now let's zoom in
+        let locationToZoomIn = CLLocationCoordinate2DMake(lat, long)
+        let region = MKCoordinateRegion(center: locationToZoomIn, latitudinalMeters: 0.25, longitudinalMeters: 0.25)
+        mapView.setRegion(region, animated: true)
     }
     
     func mapView(_ mapView: MKMapView, viewFor annotation: MKAnnotation) -> MKAnnotationView? {
@@ -96,14 +103,6 @@ class PostLocationViewController: UIViewController, MKMapViewDelegate {
             activityIndicator.stopAnimating()
         }
         postLocation.isEnabled = !posting
-    }
-    
-    func showErrorMessage(message: String) {
-        let alertVC = UIAlertController(title: "Can't post Location", message: message, preferredStyle: .alert)
-        alertVC.addAction(UIAlertAction(title: "OK", style: .default, handler: { action in
-            self.setPostingLocation(false)
-        }))
-        self.present(alertVC, animated: true, completion: nil)
     }
     
 }

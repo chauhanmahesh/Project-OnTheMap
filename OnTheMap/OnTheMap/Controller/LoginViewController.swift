@@ -23,6 +23,10 @@ class LoginViewController: UIViewController {
     }
     
     @IBAction func loginButtonTapped(_ sender: Any) {
+        if emailField.text?.isEmpty == true || passwordField.text?.isEmpty == true {
+            showError(title: "Login Failed", message: "Please enter both email and password to login.") {}
+            return;
+        }
         setLoggingIn(true)
         UdacityAPIClient.login(email: emailField.text ?? "", password: passwordField.text ?? "", completion: handleLoginResponse(success:error:))
     }
@@ -40,7 +44,9 @@ class LoginViewController: UIViewController {
             print("Login success")
             self.performSegue(withIdentifier: "completeLogin", sender: nil)
         } else {
-            showLoginFailure(message: error?.localizedDescription ?? "")
+            showError(title: "Login Failed", message: error?.localizedDescription ?? "Unknown Error") {
+                self.setLoggingIn(false)
+            }
         }
     }
     
@@ -53,14 +59,6 @@ class LoginViewController: UIViewController {
         emailField.isEnabled = !loggingIn
         passwordField.isEnabled = !loggingIn
         loginButton.isEnabled = !loggingIn
-    }
-    
-    func showLoginFailure(message: String) {
-        let alertVC = UIAlertController(title: "Login Failed", message: message, preferredStyle: .alert)
-        alertVC.addAction(UIAlertAction(title: "OK", style: .default, handler: { action in
-            self.setLoggingIn(false)
-        }))
-        show(alertVC, sender: nil)
     }
     
 }
